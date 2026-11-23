@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>تحويل النص إلى كلام بالعربية المشكولة: مقارنة ElevenLabs وHUMAIN Voice وSILMA وHabibi</title>
+<meta name="description" content="تجربة بالسمع لأربع أدوات تحويل النص إلى كلام بالعربية: هل تنطق الحركات والأصوات المفردة بدقة؟ مع 47 مقطعًا للاستماع، وما يناسب كل أداة، وطريقة تشغيل Habibi على الماك.">
+<meta property="og:title" content="تحويل النص إلى كلام بالعربية المشكولة: مقارنة بالسمع">
+<meta property="og:description" content="ElevenLabs وHUMAIN Voice وSILMA وHabibi على كلمات مشكولة وأصوات مفردة، مع مقاطع للاستماع.">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="ar_SA">
+<meta name="author" content="عبدالرحمن هريدي">
+<meta name="robots" content="index, follow">
+<link rel="license" href="https://creativecommons.org/licenses/by/4.0/">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "أي أداة تنطق العربية المشكولة بدقة؟ مقارنة بالسمع بين ElevenLabs وHUMAIN Voice وSILMA وHabibi",
+  "description": "تجربة بالسمع لأربع أدوات تحويل النص إلى كلام بالعربية على كلمات مشكولة وأصوات مفردة وجملة، مع 47 مقطعًا للاستماع وما يناسب كل أداة وطريقة تشغيل Habibi على الماك.",
+  "inLanguage": "ar",
+  "datePublished": "2026-11-23",
+  "dateModified": "2026-11-23",
+  "author": { "@type": "Person", "name": "عبدالرحمن هريدي" },
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "keywords": "تحويل النص إلى كلام, TTS عربي, التشكيل, ElevenLabs, HUMAIN Voice, SILMA TTS, Habibi TTS, استنساخ الصوت, whisper",
+  "about": [
+    { "@type": "SoftwareApplication", "name": "ElevenLabs", "url": "https://elevenlabs.io/" },
+    { "@type": "SoftwareApplication", "name": "HUMAIN Voice", "url": "https://voice.humain.com/" },
+    { "@type": "SoftwareApplication", "name": "SILMA TTS", "url": "https://huggingface.co/silma-ai/silma-tts" },
+    { "@type": "SoftwareApplication", "name": "Habibi TTS", "url": "https://huggingface.co/SWivid/Habibi-TTS" }
+  ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: an analytics console. A top bar, a KPI strip, then a 12-column grid of dark panels; charts and the listening board live in panels. Single dark theme by design. */
+:root {
+  color-scheme: dark;
+  --bg: #0b1024;
+  --panel: #131a33;
+  --panel-2: #0f1530;
+  --edge: #232b4d;
+  --ink: #e8ecfa;
+  --ink-2: #b4bbd6;
+  --ink-3: #8089ad;
+  /* tools (validated on --panel) */
+  --t-eleven: #1a9cc8; --t-humain: #8f63eb; --t-silma: #d64f93; --t-habibi: #b97f12;
+  /* states (validated on --panel) */
+  --good: #169e88; --mid: #bf8418; --bad: #e0507f; --none: #3a4268;
+  --glow: rgba(143, 99, 235, 0.18);
+  --sans: "Readex Pro", "Segoe UI", Tahoma, system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans);
+  font-size: 15px; line-height: 1.75; font-weight: 400;
+  background-image: radial-gradient(1200px 500px at 85% -10%, var(--glow), transparent 60%);
+  background-repeat: no-repeat;
+}
+a { color: #6cc6ea; }
+a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.wrap {
+  max-width: 1240px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+code, pre, .num { font-family: var(--mono); }
+.num { font-variant-numeric: tabular-nums; }
+
+/* Top bar */
+.topbar { border-bottom: 1px solid var(--edge); background: rgba(11, 16, 36, 0.85); padding-top: env(safe-area-inset-top, 0px); }
+.topbar .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding-block: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; }
+.brand svg { width: 22px; height: 22px; }
+.top-meta { margin-inline-start: auto; display: flex; flex-wrap: wrap; gap: 8px 16px; color: var(--ink-3); font-size: 13px; }
+.top-meta .live { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); }
+.top-meta .live::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--good); }
+
+/* Hero */
+.hero { padding-block: 34px 22px; display: grid; gap: 10px; }
+.eyebrow { color: var(--ink-3); font-size: 13px; letter-spacing: 0.02em; }
+h1 { margin: 0; font-size: clamp(26px, 4.4vw, 42px); line-height: 1.3; font-weight: 600; text-wrap: balance; max-width: 26ch; }
+.byline { color: var(--ink-3); font-size: 14px; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.byline strong { color: var(--ink); font-weight: 500; }
+.lead { color: var(--ink-2); font-size: 16.5px; max-width: 70ch; margin: 4px 0 0; }
+
+/* Grid + panels */
+.grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 14px; padding-bottom: 14px; }
+.panel { background: var(--panel); border: 1px solid var(--edge); border-radius: 10px; padding: 16px 18px; min-width: 0; display: grid; gap: 12px; align-content: start; }
+.panel h2 { margin: 0; font-size: 15px; font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 8px; }
+.panel h2 .hint { color: var(--ink-3); font-weight: 400; font-size: 13px; }
+.panel p { margin: 0; color: var(--ink-2); max-width: 72ch; }
+.span-3 { grid-column: span 3; } .span-4 { grid-column: span 4; } .span-5 { grid-column: span 5; }
+.span-6 { grid-column: span 6; } .span-7 { grid-column: span 7; } .span-8 { grid-column: span 8; } .span-12 { grid-column: span 12; }
+.section-title { grid-column: span 12; margin: 18px 0 0; font-size: 20px; font-weight: 600; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.section-title span { color: var(--ink-3); font-size: 14px; font-weight: 400; }
+
+/* KPIs */
+.kpi { gap: 4px; }
+.kpi .label { color: var(--ink-3); font-size: 13px; }
+.kpi .value { font-family: var(--mono); font-size: clamp(34px, 5vw, 48px); font-weight: 500; line-height: 1.1; letter-spacing: -0.02em; }
+.kpi .value small { font-family: var(--sans); font-size: 15px; color: var(--ink-2); font-weight: 400; margin-inline-start: 6px; letter-spacing: 0; }
+.kpi .sub { color: var(--ink-2); font-size: 13.5px; }
+
+/* Tool panels */
+.tool-panel { border-top: 3px solid var(--tc); }
+.tool-top { display: flex; align-items: center; gap: 14px; }
+.tool-top .names { display: grid; gap: 2px; min-width: 0; }
+.tool-name { font-size: 18px; font-weight: 600; }
+.tool-where { color: var(--ink-3); font-size: 12.5px; }
+.donut { width: 84px; height: 84px; flex: none; }
+.donut text { font-family: var(--mono); fill: var(--ink); }
+.verdict { justify-self: start; font-size: 12.5px; font-weight: 500; padding: 2px 10px; border-radius: 4px; background: var(--panel-2); border: 1px solid var(--edge); color: var(--ink); display: inline-flex; gap: 6px; align-items: center; }
+.verdict::before { content: ""; width: 8px; height: 8px; border-radius: 2px; background: var(--vc); }
+.fitlist { display: grid; gap: 6px; font-size: 14px; }
+.fitlist div { display: grid; grid-template-columns: 4.6em 1fr; gap: 8px; }
+.fitlist dt { color: var(--ink-3); }
+.fitlist dd { margin: 0; color: var(--ink-2); }
+.meta-line { color: var(--ink-3); font-size: 12.5px; border-top: 1px solid var(--edge); padding-top: 10px; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; color: var(--ink-3); font-size: 12.5px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-inline-end: 6px; vertical-align: -1px; }
+
+/* Matrix */
+.matrix-wrap { overflow-x: auto; }
+.matrix { border-collapse: separate; border-spacing: 3px; width: 100%; min-width: 680px; font-size: 13.5px; }
+.matrix th { font-weight: 500; color: var(--ink-3); text-align: start; padding: 6px 8px; white-space: nowrap; }
+.matrix thead th { font-size: 12.5px; }
+.matrix thead th span { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-inline-end: 6px; }
+.matrix tbody th { color: var(--ink-2); }
+.cell { border-radius: 4px; padding: 7px 10px; color: var(--ink); white-space: nowrap; }
+.cell::before { font-family: var(--mono); margin-inline-end: 6px; font-weight: 500; }
+.cell.good { background: color-mix(in srgb, var(--good) 30%, var(--panel)); box-shadow: inset -3px 0 0 var(--good); }
+.cell.good::before { content: "✓"; }
+.cell.mid { background: color-mix(in srgb, var(--mid) 26%, var(--panel)); box-shadow: inset -3px 0 0 var(--mid); }
+.cell.mid::before { content: "~"; }
+.cell.bad { background: color-mix(in srgb, var(--bad) 26%, var(--panel)); box-shadow: inset -3px 0 0 var(--bad); }
+.cell.bad::before { content: "✗"; }
+.cell.na { background: var(--panel-2); color: var(--ink-3); }
+.cell.info { background: var(--panel-2); color: var(--ink-2); }
+
+/* Waves + pause bars */
+.wave-row { display: grid; gap: 4px; }
+.wave-head { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 2px 10px; font-size: 13.5px; }
+.wave-head b { font-weight: 500; }
+.wave-head span { color: var(--ink-3); }
+canvas.wave { width: 100%; height: 70px; display: block; background: var(--panel-2); border-radius: 6px; border: 1px solid var(--edge); }
+.axis { display: flex; justify-content: space-between; direction: ltr; color: var(--ink-3); font-size: 11.5px; font-family: var(--mono); }
+.hbars { display: grid; gap: 14px; }
+.hbar { display: grid; gap: 4px; }
+.hbar-head { display: flex; justify-content: space-between; font-size: 13.5px; }
+.hbar-head .num { font-size: 20px; font-weight: 500; }
+.hbar-track { height: 12px; background: var(--panel-2); border-radius: 3px; overflow: hidden; }
+.hbar-fill { height: 100%; border-radius: 3px; }
+
+/* Listening board */
+.filters { display: flex; flex-wrap: wrap; gap: 6px; }
+.filters button { font: inherit; font-size: 13px; color: var(--ink-2); background: var(--panel-2); border: 1px solid var(--edge); border-radius: 999px; padding: 3px 12px; cursor: pointer; }
+.filters button[aria-pressed="true"] { color: var(--ink); border-color: var(--ink-3); background: #1b2347; }
+.board { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; }
+.word { background: var(--panel-2); border: 1px solid var(--edge); border-radius: 8px; padding: 12px; display: grid; gap: 10px; min-width: 0; }
+.word-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; }
+.word-head .w { font-size: 22px; font-weight: 600; line-height: 1.4; }
+.word-head .k { color: var(--ink-3); font-size: 12.5px; }
+.clips { display: grid; gap: 6px; }
+.clip { display: grid; grid-template-columns: 32px 8.5em 1fr; gap: 10px; align-items: center; min-width: 0; padding: 4px 0; border-top: 1px solid var(--edge); }
+.clip:first-child { border-top: 0; }
+.play { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--tc); background: transparent; color: var(--tc); cursor: pointer; display: grid; place-items: center; padding: 0; }
+.play svg { width: 12px; height: 12px; fill: currentColor; }
+.play[aria-pressed="true"] { background: var(--tc); color: var(--bg); }
+.clip .t { font-size: 13px; color: var(--ink); line-height: 1.35; }
+.clip .h { font-size: 13px; color: var(--ink-3); line-height: 1.4; overflow-wrap: anywhere; }
+.clip .h b { color: var(--ink-2); font-weight: 500; }
+
+/* Notes, code, details */
+.note-good { border-inline-start: 3px solid var(--good); }
+pre { margin: 0; background: #080c1c; border: 1px solid var(--edge); border-radius: 8px; padding: 14px; overflow-x: auto; direction: ltr; text-align: left; font-size: 12.5px; line-height: 1.7; color: #cdd5f3; }
+pre .c { color: #6f7aa3; }
+ul.clean { margin: 0; padding-inline-start: 18px; display: grid; gap: 6px; color: var(--ink-2); }
+ul.clean b { color: var(--ink); font-weight: 500; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--edge); background: var(--panel-2); border-radius: 6px; padding: 2px 10px; font-size: 15px; }
+.chip small { color: var(--ink-3); font-size: 11.5px; margin-inline-start: 6px; }
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; counter-reset: s; }
+.step { background: var(--panel-2); border: 1px solid var(--edge); border-radius: 6px; padding: 10px; display: grid; gap: 2px; counter-increment: s; font-size: 13px; color: var(--ink-2); }
+.step::before { content: counter(s); font-family: var(--mono); color: var(--t-humain); font-size: 13px; }
+.step b { color: var(--ink); font-weight: 500; font-size: 14px; }
+footer b { color: var(--ink-2); font-weight: 500; }
+footer { border-top: 1px solid var(--edge); margin-top: 26px; padding-block: 22px 40px; color: var(--ink-3); font-size: 13px; display: grid; gap: 10px; }
+.licenses { margin: 0; display: grid; gap: 4px; }
+.licenses div { display: grid; grid-template-columns: 13em 1fr; gap: 10px; }
+.licenses dt { color: var(--ink-2); }
+.licenses dd { margin: 0; min-width: 0; }
+@media (max-width: 560px) { .licenses div { grid-template-columns: 1fr; gap: 0; } .licenses div + div { margin-top: 6px; } }
+.tip { position: fixed; z-index: 20; pointer-events: none; background: #050817; color: var(--ink); border: 1px solid var(--edge); font-size: 12.5px; line-height: 1.6; padding: 6px 10px; border-radius: 6px; max-width: 280px; }
+
+@media (max-width: 1000px) {
+  .span-3 { grid-column: span 6; } .span-4, .span-5, .span-7, .span-8 { grid-column: span 12; } .span-6 { grid-column: span 12; }
+  .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .span-3 { grid-column: span 12; }
+  .board { grid-template-columns: minmax(0, 1fr); }
+  .clip { grid-template-columns: 32px 1fr; }
+  .clip .h { grid-column: 2; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="9" width="2.4" height="6" rx="1.2" fill="#1a9cc8"/><rect x="6.4" y="5" width="2.4" height="14" rx="1.2" fill="#8f63eb"/><rect x="10.8" y="2" width="2.4" height="20" rx="1.2" fill="#d64f93"/><rect x="15.2" y="6" width="2.4" height="12" rx="1.2" fill="#8f63eb"/><rect x="19.6" y="10" width="2.4" height="4" rx="1.2" fill="#1a9cc8"/></svg>
+      مختبر الصوت العربي
+    </div>
+    <div class="top-meta"><span class="live">تجربة بالسمع</span><span>نوفمبر 2026</span><span>4 أدوات · 12 نصًا</span></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <span class="eyebrow">تحويل النص إلى كلام · العربية الفصحى المشكولة</span>
+    <h1>أي أداة تنطق العربية المشكولة بدقة؟</h1>
+    <div class="byline"><strong>عبدالرحمن هريدي</strong><span>23 نوفمبر 2026</span></div>
+    <p class="lead">قارنت بالسمع أربع أدوات لتحويل النص إلى كلام: ElevenLabs وHUMAIN Voice، وهما خدمتان سحابيتان، وSILMA وHabibi، وهما نموذجان يعملان على الماك. كان المطلوب محتوى تعليميًا يعتمد على السمع، يحتاج كلمات مشكولة وأصواتًا مفردة مثل «مَـ» و«بْ»، فخطأ حركة واحدة يعلّم المستمع صوتًا خاطئًا. هنا النتيجة، وما يناسب كل أداة، و47 مقطعًا تسمعها بنفسك.</p>
+  </section>
+
+  <div class="grid">
+    <div class="panel kpi span-3"><span class="label">أدوات جُرّبت</span><span class="value num">4</span><span class="sub">2 سحابية · 2 على الماك</span></div>
+    <div class="panel kpi span-3"><span class="label">نصوص صعبة</span><span class="value num">12</span><span class="sub">كلمات، همزة، ضاد، أصوات مفردة، جملة</span></div>
+    <div class="panel kpi span-3"><span class="label">مقاطع للاستماع</span><span class="value num">47</span><span class="sub">كل نص بكل أداة جُرّب عليها</span></div>
+    <div class="panel kpi span-3"><span class="label">نطقت الأصوات المفردة بدقة</span><span class="value num">1<small>من 4</small></span><span class="sub">ElevenLabs v3 وحده</span></div>
+
+    <h2 class="section-title">أيها يناسبك؟<span>الدائرة: ما سمعه whisper صحيحًا في 6 نصوص يعرفها جيدًا</span></h2>
+    <div id="tools" class="span-12" style="display:contents"></div>
+    <div class="legend span-12" aria-hidden="true"><span><i style="background:var(--good)"></i>صحيح</span><span><i style="background:var(--mid)"></i>قريب</span><span><i style="background:var(--bad)"></i>خطأ</span><span><i style="background:var(--none)"></i>لم يُعدّ</span></div>
+
+    <h2 class="section-title">النتيجة بندًا بندًا</h2>
+    <div class="panel span-12">
+      <div class="matrix-wrap">
+        <table class="matrix">
+          <thead><tr><th scope="col">البند</th>
+            <th scope="col"><span style="background:var(--t-eleven)"></span>ElevenLabs v3</th>
+            <th scope="col"><span style="background:var(--t-humain)"></span>HUMAIN Voice</th>
+            <th scope="col"><span style="background:var(--t-silma)"></span>SILMA v1</th>
+            <th scope="col"><span style="background:var(--t-habibi)"></span>Habibi</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">الكلمات العادية</th><td class="cell good">جيد</td><td class="cell good">جيد</td><td class="cell mid">مقبول غالبًا</td><td class="cell mid">جيد بلا تشكيل فقط</td></tr>
+            <tr><th scope="row">الهمزة في أول الكلمة</th><td class="cell good">جيد</td><td class="cell good">جيد</td><td class="cell na">تحتاج السمع</td><td class="cell na">تحتاج السمع</td></tr>
+            <tr><th scope="row">اتباع التشكيل المكتوب</th><td class="cell good">جيد</td><td class="cell mid">يختار الحركات وحده</td><td class="cell mid">متفاوت</td><td class="cell bad">يفسد الكلمة</td></tr>
+            <tr><th scope="row">الأصوات والمقاطع المفردة</th><td class="cell good">جيد</td><td class="cell bad">يدمجها أو يغيّرها</td><td class="cell bad">غير موثوق</td><td class="cell bad">غير موثوق</td></tr>
+            <tr><th scope="row">الوقفات للتقطيع الآلي</th><td class="cell good">يلتزم بها</td><td class="cell bad">يتجاهلها</td><td class="cell na">نص لكل طلب</td><td class="cell na">نص لكل طلب</td></tr>
+            <tr><th scope="row">أين يعمل</th><td class="cell info">سحابي</td><td class="cell info">سحابي</td><td class="cell info">على الجهاز</td><td class="cell info">على الجهاز</td></tr>
+            <tr><th scope="row">الاستعمال التجاري</th><td class="cell info">في الخطط المدفوعة</td><td class="cell info">لم أراجع شروطه</td><td class="cell info">نسخة مفتوحة</td><td class="cell info">نموذج الفصحى فقط</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>«تحتاج السمع» تعني أن whisper لا يحكم في البند، لا أن الأداة ضعيفة فيه.</p>
+    </div>
+
+    <h2 class="section-title">الوقفات بين النصوص<span>لماذا يهم ذلك إذا سجّلت مئات الكلمات</span></h2>
+    <div class="panel span-8">
+      <h2>شكل الصوت في أول 10 ثوانٍ <span class="hint">كل خط علوّ الصوت في لحظته، والفراغ صمت</span></h2>
+      <div class="wave-row"><div class="wave-head"><b>ElevenLabs v3</b><span>يسكت بعد كل نص كما طُلب</span></div><canvas class="wave" id="wave-eleven" role="img" aria-label="ElevenLabs: كلام تتخلله عشر وقفات واضحة"></canvas></div>
+      <div class="wave-row"><div class="wave-head"><b>HUMAIN Voice</b><span>14 نصًا متصلة تقريبًا</span></div><canvas class="wave" id="wave-humain" role="img" aria-label="HUMAIN: كلام متصل بلا وقفات تقريبًا"></canvas></div>
+      <div class="axis" aria-hidden="true"><span>0s</span><span>2.5</span><span>5</span><span>7.5</span><span>10s</span></div>
+    </div>
+    <div class="panel span-4">
+      <h2>وقفات ربع ثانية فأكثر <span class="hint">في 10 ثوانٍ</span></h2>
+      <div class="hbars">
+        <div class="hbar"><div class="hbar-head"><span>ElevenLabs v3</span><span class="num">10</span></div><div class="hbar-track"><div class="hbar-fill" style="width:100%;background:var(--t-eleven)"></div></div></div>
+        <div class="hbar"><div class="hbar-head"><span>HUMAIN Voice</span><span class="num">2</span></div><div class="hbar-track"><div class="hbar-fill" style="width:20%;background:var(--t-humain)"></div></div></div>
+      </div>
+      <p>أسرع طريقة لتسجيل مئات الكلمات أن تُكتب كلها في طلب واحد بينها وقفات، ثم يُقطّع الملف آليًا عند الصمت. قرأ HUMAIN اثنتي عشرة كلمة في 5.4 ثانية بلا فواصل، فلا بد معه من طلب مستقل لكل كلمة.</p>
+    </div>
+
+    <h2 class="section-title">استمع وقارن<span>المقطع الأول في كل بطاقة هو ElevenLabs للمقارنة</span></h2>
+    <div class="panel span-12">
+      <div class="filters" role="group" aria-label="اعرض نوعًا من النصوص">
+        <button type="button" data-f="all" aria-pressed="true">الكل</button>
+        <button type="button" data-f="word" aria-pressed="false">كلمات</button>
+        <button type="button" data-f="hard" aria-pressed="false">همزة وضاد</button>
+        <button type="button" data-f="sound" aria-pressed="false">أصوات ومقاطع</button>
+        <button type="button" data-f="sentence" aria-pressed="false">جملة</button>
+      </div>
+      <div class="board" id="board"></div>
+      <p>تحت كل مقطع ما كتبه whisper حين سمعه. مقاطع HUMAIN مقصوصة تقريبيًا من تسجيله المتصل، فقد يدخل فيها طرف الكلمة المجاورة. مقاطع SILMA بصوت النموذج الافتراضي.</p>
+    </div>
+
+    <h2 class="section-title">ما تعلّمته في الطريق</h2>
+    <div class="panel span-6 note-good">
+      <h2>الفحص الآلي لا يكفي في الكلمات القصيرة</h2>
+      <p>استعملت whisper ليكتب ما يسمعه في كل مقطع. ثم جربته على تسجيلات ElevenLabs الصحيحة نفسها، فسمع «أُرِيدُ» «وريدو»، و«ضَعْ» «بار»، و«مِيم» «مين».</p>
+      <p>فهو يصلح لفحص الكلمات المألوفة والجمل، ولا يحكم على الكلمة القصيرة ولا الصوت المفرد. وما سمعه فيها مع أي أداة لا يدل على خطئها. الحكم فيها للأذن.</p>
+    </div>
+    <div class="panel span-6">
+      <h2>كيف جربت</h2>
+      <div class="steps">
+        <div class="step"><b>نص مشكول</b>كل نص في سطر، بعده وقفة <code>... ...</code></div>
+        <div class="step"><b>توليد</b>صوت رجل بالفصحى، وباستنساخ الصوت حيث أمكن</div>
+        <div class="step"><b>تقطيع</b>عند الوقفات، ملف لكل نص</div>
+        <div class="step"><b>فحص آلي</b>whisper يكتب ما سمع</div>
+        <div class="step"><b>سمع</b>الحكم الأخير بالأذن</div>
+      </div>
+      <div class="chips" aria-label="النصوص المختبرة">
+        <span class="chip">مَطَر<small>كلمة</small></span><span class="chip">مِلْح<small>كلمة</small></span><span class="chip">مُحَمَّد<small>شدة</small></span><span class="chip">مِفْتَاح<small>كلمة</small></span><span class="chip">أُرِيدُ<small>همزة</small></span><span class="chip">أَمْجَاد<small>همزة ومد</small></span><span class="chip">ضَعْ<small>ضاد</small></span><span class="chip">مِيم<small>اسم حرف</small></span><span class="chip">مَـ<small>صوت</small></span><span class="chip">بْ<small>صوت</small></span><span class="chip">مَحْ · مُودْ<small>مقطعان</small></span><span class="chip">اِصْطَدِ الْكَلِمَةَ الَّتِي لَا تَبْدَأُ بِصَوْتِ<small>جملة</small></span>
+      </div>
+    </div>
+
+    <h2 class="section-title">تفاصيل كل أداة</h2>
+    <div class="panel span-6 tool-panel" style="--tc:var(--t-eleven)">
+      <h2>ElevenLabs v3 <span class="hint">elevenlabs.io · سحابي</span></h2>
+      <ul class="clean">
+        <li>استعملت صوت «Abdullah» من مكتبة الأصوات، النموذج v3.</li>
+        <li><b>الأصوات المفردة والمقاطع:</b> «مَـ» و«بْ» و«مَحْ» و«مُودْ» مسموعة كما كُتبت.</li>
+        <li><b>الوقفات:</b> يلتزم بها، فيُكتب مئات النصوص في طلب واحد ويُقطّع الملف آليًا.</li>
+        <li>الاستعمال التجاري في الخطط المدفوعة. الخطة المجانية تطلب ذكر elevenlabs.io.</li>
+      </ul>
+    </div>
+    <div class="panel span-6 tool-panel" style="--tc:var(--t-humain)">
+      <h2>HUMAIN Voice <span class="hint">voice.humain.com · سحابي</span></h2>
+      <ul class="clean">
+        <li>منصة سعودية تجمع تحويل الكلام إلى نص، وتوليد الصوت، والوكلاء الصوتيين، وتركّز على اللهجات السعودية والخليجية.</li>
+        <li><b>جيد:</b> مطر، ملح، مفتاح، أريد. والجملة صحيحة بتشكيل وبدونه، فهو يختار الحركات وحده.</li>
+        <li><b>مُحَمَّد:</b> أطول من الكلمة (1.3 ثانية)، وفيها أصوات زائدة.</li>
+        <li><b>المقاطع:</b> دمج «مَحْ» و«مُودْ» في «محمود»، ونطق «مِيم، مَـ، بْ» شيئًا آخر.</li>
+      </ul>
+    </div>
+    <div class="panel span-6 tool-panel" style="--tc:var(--t-silma)">
+      <h2>SILMA TTS v1 <span class="hint">silma.ai · مفتوح · على الماك</span></h2>
+      <ul class="clean">
+        <li>النسخة المفتوحة (150 مليون معامل). جربتها باستنساخ صوت وبصوتها الافتراضي، وسمعت تسجيلاتها داخل تطبيق تعليمي.</li>
+        <li>الكلمات العادية مقبولة غالبًا. الأصوات المفردة غير موثوقة، وطول المقطع يحتاج أحيانًا أكثر من محاولة.</li>
+        <li><b>حيلة للهمزة في أول الكلمة:</b> أن يقول «قُلْ.» قبل الكلمة، ثم تُقصّ عند الصمت.</li>
+        <li>لم أجرب النسخة السحابية v2: للفصحى والنجدية، وتستنسخ الصوت من عينة 10 ثوانٍ، ومن نحو 0.02 دولار للدقيقة.</li>
+      </ul>
+    </div>
+    <div class="panel span-6 tool-panel" style="--tc:var(--t-habibi)">
+      <h2>Habibi TTS <span class="hint">مفتوح · F5-TTS · على الماك</span></h2>
+      <ul class="clean">
+        <li>يستنسخ الصوت من تسجيل مرجعي قصير. استعملت تسجيل ElevenLabs نفسه مرجعًا، والجملة القصيرة تأخذ نحو 11 ثانية على معالج رسوم الماك.</li>
+        <li><b>بلا تشكيل:</b> مطر، ملح، محمد، مفتاح صحيحة الحروف، والحركات من اختياره.</li>
+        <li><b>بالتشكيل:</b> يقرأ الحركات كأنها أصوات: «مُحَمَّد» صارت «محمن جد».</li>
+        <li>النموذج الموحّد للهجات غير تجاري (CC-BY-NC-SA). نموذج الفصحى Apache 2.0، لكنه جاء أضعف.</li>
+      </ul>
+    </div>
+
+    <h2 class="section-title">شغّل Habibi على الماك<span>Apple Silicon · نحو 3 غ.ب</span></h2>
+    <div class="panel span-7">
+<pre><span class="c"># 1. Python أصلي لمعالج Apple (arm64)؛ نسخة Intel لا تدعمها PyTorch</span>
+uv python install 3.12
+uv venv --python 3.12 ~/habibi-tts/venv
+source ~/habibi-tts/venv/bin/activate
+
+<span class="c"># 2. torch وtorchaudio بنسختين متطابقتين</span>
+pip install habibi-tts torch==2.8.0 torchaudio==2.8.0
+
+<span class="c"># 3. كلمة واحدة بصوت مرجعي (6–10 ثوانٍ)، ونصه بلا تشكيل</span>
+habibi-tts_infer-cli -m Unified -d MSA --device mps \
+  -r ref.wav -s "نص التسجيل المرجعي بلا تشكيل" \
+  -t "مطر" -w matar.wav --fix_duration 8.2
+
+<span class="c"># واجهة رسومية في المتصفح</span>
+habibi-tts_infer-gradio</pre>
+    </div>
+    <div class="panel span-5">
+      <h2>ثلاث ملاحظات قبل أن تبدأ</h2>
+      <ul class="clean">
+        <li><b>نص المرجع بلا تشكيل.</b> النموذج يقدّر طول الكلام من عدد الحروف، فالتشكيل في نص المرجع يُفسد التقدير، فتخرج الكلمة 0.3 ثانية.</li>
+        <li><b>ثبّت طول الكلمات القصيرة.</b> <code>--fix_duration</code> هو طول المرجع مع طول الكلمة بالثواني.</li>
+        <li><b>الاستنساخ بإذن.</b> لا تستنسخ صوت أحد إلا بإذنه، ونماذج الاستنساخ كلها تشترط ذلك.</li>
+      </ul>
+    </div>
+
+    <h2 class="section-title">الخلاصة</h2>
+    <div class="panel span-12">
+      <ul class="clean">
+        <li><b>محتوى تعليمي مشكول، أصوات مفردة، أسماء حروف:</b> ElevenLabs v3، ثم يُسمع كل مقطع قبل نشره.</li>
+        <li><b>جمل تعليمات، محتوى حواري، لهجة سعودية:</b> HUMAIN Voice، فهو أقوى البدائل في الكلام العادي.</li>
+        <li><b>مسودات سريعة على جهازك:</b> SILMA المفتوح. ونسخته السحابية تستحق التجربة لوكلاء المحادثة.</li>
+        <li><b>تجارب ولهجات وجمل غير مشكولة:</b> Habibi، وللاستعمال التجاري نموذج الفصحى وحده.</li>
+        <li><b>في كل الأحوال:</b> لا يُقبل تسجيل مولّد آليًا لمحتوى تعليمي قبل أن يسمعه إنسان.</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>
+    <span>المصادر: <a href="https://elevenlabs.io/">elevenlabs.io</a> · <a href="https://www.humain.com/ar/news/humain-launches-humain-voice">إعلان HUMAIN Voice</a> · <a href="https://silma.ai/">silma.ai</a> · <a href="https://swivid.github.io/Habibi/">Habibi</a> · <a href="https://github.com/ggml-org/whisper.cpp">whisper.cpp</a></span>
+    <span><b>الغرض:</b> هذه تجربة بحثية غير تجارية، غرضها تقييم دقة أدوات تحويل النص إلى كلام في نطق العربية المشكولة، ومشاركة النتيجة ليفيد منها من يختار أداة لمحتوى عربي. لا صلة لها بأي من الشركات المذكورة، ولم يُدفع لها مقابل.</span>
+    <span><b>إفصاح:</b> كل المقاطع في هذه الصفحة أصوات مولّدة آليًا، لا تسجيلات بشرية، ونُشرت لهذا الغرض البحثي وحده. الأدوات تتغير، والنتيجة كما كانت في نوفمبر 2026.</span>
+    <dl class="licenses">
+      <div><dt>نص الصفحة وتصميمها ورسومها</dt><dd><a href="https://creativecommons.org/licenses/by/4.0/deed.ar" rel="license">CC BY 4.0</a>: انقلها وعدّلها بذكر المصدر.</dd></div>
+      <div><dt>مقاطع ElevenLabs</dt><dd>مولّدة بـ <a href="https://elevenlabs.io/">elevenlabs.io</a>، ووفق <a href="https://elevenlabs.io/terms-of-use">شروطها</a>.</dd></div>
+      <div><dt>مقاطع HUMAIN Voice</dt><dd>مولّدة بالخطة المجانية لغرض بحثي غير تجاري، ووفق <a href="https://voice.humain.com/legal/terms-of-service">شروطها</a>. تُحذف إن طلبت HUMAIN ذلك.</dd></div>
+      <div><dt>مقاطع SILMA</dt><dd>من النموذج المفتوح <a href="https://huggingface.co/silma-ai/silma-tts">SILMA TTS v1</a> (Apache 2.0) بصوته الافتراضي.</dd></div>
+      <div><dt>مقاطع Habibi</dt><dd>من <a href="https://huggingface.co/SWivid/Habibi-TTS">Habibi-TTS</a> الموحّد، وهي مثله تحت <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.ar">CC BY-NC-SA 4.0</a>: غير تجارية، وبذكر المصدر، وبالرخصة نفسها.</dd></div>
+    </dl>
+    <span>للاستشهاد: عبدالرحمن هريدي، «أي أداة تنطق العربية المشكولة بدقة؟ مقارنة بالسمع بين ElevenLabs وHUMAIN Voice وSILMA وHabibi»، 23 نوفمبر 2026.</span>
+  </footer>
+</main>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+const DATA = {"items":[{"key":"matar","text":"مَطَر","clips":{"eleven":{"src":"audio/matar-eleven.mp3","heard":"مطر","seconds":0.82},"habibi-b":{"src":"audio/matar-habibi-b.mp3","heard":"مطر","seconds":1.15},"habibi-v":{"src":"audio/matar-habibi-v.mp3","heard":"موطعر","seconds":1.15},"humain":{"src":"audio/matar-humain.mp3","heard":"مطلق","seconds":0.46}}},{"key":"milh","text":"مِلْح","clips":{"eleven":{"src":"audio/milh-eleven.mp3","heard":"ملح","seconds":0.84},"habibi-b":{"src":"audio/milh-habibi-b.mp3","heard":"ملح","seconds":1.15},"habibi-v":{"src":"audio/milh-habibi-v.mp3","heard":"مولح","seconds":1.15},"humain":{"src":"audio/milh-humain.mp3","heard":"ترم الحلقة","seconds":0.48}}},{"key":"muhammad","text":"مُحَمَّد","clips":{"eleven":{"src":"audio/muhammad-eleven.mp3","heard":"محمد","seconds":0.98},"habibi-b":{"src":"audio/muhammad-habibi-b.mp3","heard":"محمد","seconds":1.37},"habibi-v":{"src":"audio/muhammad-habibi-v.mp3","heard":"محمن جد","seconds":1.37},"humain":{"src":"audio/muhammad-humain.mp3","heard":"محمد كتور مفتاح","seconds":1.42}}},{"key":"miftah","text":"مِفْتَاح","clips":{"eleven":{"src":"audio/miftah-eleven.mp3","heard":"مفتاح","seconds":1.03},"habibi-b":{"src":"audio/miftah-habibi-b.mp3","heard":"مفتاح","seconds":1.37},"habibi-v":{"src":"audio/miftah-habibi-v.mp3","heard":"مؤفة أح","seconds":1.37},"humain":{"src":"audio/miftah-humain.mp3","heard":"ويجب أن تحصل على تحول","seconds":0.41}}},{"key":"urid","text":"أُرِيدُ","clips":{"eleven":{"src":"audio/urid-eleven.mp3","heard":"\"وريدو\"","seconds":0.82},"silma":{"src":"audio/urid-silma.mp3","heard":"ورئيس","seconds":1.03},"habibi-b":{"src":"audio/urid-habibi-b.mp3","heard":"\"وريد\"","seconds":1.15},"habibi-v":{"src":"audio/urid-habibi-v.mp3","heard":"أرنيدو","seconds":1.15},"humain":{"src":"audio/urid-humain.mp3","heard":"وريد","seconds":0.41}}},{"key":"amjad","text":"أَمْجَاد","clips":{"eleven":{"src":"audio/amjad-eleven.mp3","heard":"امجد","seconds":0.98},"silma":{"src":"audio/amjad-silma.mp3","heard":"أمجد","seconds":0.98},"habibi-b":{"src":"audio/amjad-habibi-b.mp3","heard":"mjad","seconds":1.27},"habibi-v":{"src":"audio/amjad-habibi-v.mp3","heard":"وأم جيد؟","seconds":1.27},"humain":{"src":"audio/amjad-humain.mp3","heard":"وانتبه","seconds":0.86}}},{"key":"da3","text":"ضَعْ","clips":{"eleven":{"src":"audio/da3-eleven.mp3","heard":"بار","seconds":0.72},"silma":{"src":"audio/da3-silma.mp3","heard":"بدا","seconds":0.7},"habibi-b":{"src":"audio/da3-habibi-b.mp3","heard":"با","seconds":0.86},"habibi-v":{"src":"audio/da3-habibi-v.mp3","heard":"بقى","seconds":0.86},"humain":{"src":"audio/da3-humain.mp3","heard":"لأ","seconds":0.53}}},{"key":"mim","text":"مِيم","clips":{"eleven":{"src":"audio/mim-eleven.mp3","heard":"مين","seconds":0.84},"habibi-v":{"src":"audio/mim-habibi-v.mp3","heard":"مويم","seconds":1.06},"humain":{"src":"audio/mim-humain.mp3","heard":"مي مادات محب","seconds":1.22}}},{"key":"ma","text":"مَـ","clips":{"eleven":{"src":"audio/ma-eleven.mp3","heard":"مه","seconds":0.7},"silma":{"src":"audio/ma-silma.mp3","heard":"(تروني)","seconds":0.79},"habibi-v":{"src":"audio/ma-habibi-v.mp3","heard":"مه","seconds":0.86}}},{"key":"b","text":"بْ","clips":{"eleven":{"src":"audio/b-eleven.mp3","heard":"ب","seconds":0.58},"silma":{"src":"audio/b-silma.mp3","heard":"ونبدأ","seconds":0.62},"habibi-v":{"src":"audio/b-habibi-v.mp3","heard":"سنقوم بعمل","seconds":0.86}}},{"key":"mahmud","text":"مَحْ · مُودْ","clips":{"eleven":{"src":"audio/mahmud-eleven.mp3","heard":"مح مود","seconds":1.44},"humain":{"src":"audio/mahmud-humain.mp3","heard":"موت","seconds":0.72}}},{"key":"sentence","text":"اِصْطَدِ الْكَلِمَةَ الَّتِي لَا تَبْدَأُ بِصَوْتِ","clips":{"eleven":{"src":"audio/sentence-eleven.mp3","heard":"استضل كلمة التي لا تبدأ بصوت","seconds":3.0},"habibi-b":{"src":"audio/sentence-habibi-b.mp3","heard":"استضل كلمة التي لا تبدأ بصوت","seconds":3.07},"habibi-v":{"src":"audio/sentence-habibi-v.mp3","heard":"الصطع ده الإكلائمية الوغطري لأتبدأ بأصوات","seconds":5.47},"humain-v":{"src":"audio/sentence-humain-v.mp3","heard":"استطد الكلمة التي لا تبدأ بصوت","seconds":2.35},"humain-b":{"src":"audio/sentence-humain-b.mp3","heard":"أصطاد الكلمة التي لا تبدأ بصوت","seconds":2.52}}}],"wave":{"humain":[0.0,0.0,0.0,0.076,0.177,0.261,0.245,0.002,0.305,0.333,0.22,0.114,0.041,0.09,0.184,0.208,0.134,0.079,0.012,0.061,0.073,0.055,0.303,0.288,0.261,0.192,0.114,0.055,0.018,0.129,0.099,0.099,0.059,0.122,0.027,0.039,0.0,0.071,0.212,0.284,0.272,0.148,0.11,0.116,0.059,0.003,0.0,0.169,0.24,0.27,0.241,0.02,0.087,0.082,0.116,0.163,0.164,0.145,0.141,0.058,0.06,0.096,0.111,0.113,0.072,0.216,0.163,0.169,0.181,0.058,0.079,0.293,0.299,0.25,0.003,0.0,0.0,0.001,0.049,0.066,0.44,0.441,0.41,0.25,0.18,0.006,0.001,0.008,0.168,0.224,0.229,0.213,0.213,0.212,0.138,0.126,0.227,0.216,0.201,0.182,0.074,0.046,0.044,0.295,0.337,0.268,0.023,0.001,0.114,0.176,0.157,0.009,0.009,0.0,0.0,0.0,0.081,0.122,0.219,0.196,0.23,0.229,0.069,0.029,0.001,0.0,0.0,0.003,0.0,0.0,0.0,0.0,0.013,0.092,0.054,0.005,0.004,0.495,0.483,0.085,0.214,0.216,0.113,0.003,0.077,0.319,0.411,0.306,0.227,0.29,0.314,0.15,0.322,0.241,0.015,0.031,0.175,0.17,0.31,0.382,0.281,0.014,0.236,0.298,0.075,0.069,0.343,0.231,0.209,0.248,0.117,0.228,0.068,0.004,0.212,0.235,0.154,0.098,0.003,0.01,0.006,0.0,0.003,0.002,0.002,0.002,0.039,0.113,0.038,0.005,0.257,0.2,0.089,0.247,0.117,0.07,0.071,0.238,0.339,0.256,0.214,0.239,0.248,0.14,0.3,0.242,0.01,0.147,0.147,0.302,0.398,0.277,0.064,0.174,0.297,0.068,0.063,0.309,0.403,0.2,0.076,0.212,0.195,0.008,0.183,0.206,0.19,0.107,0.051,0.0,0.007,0.006,0.002,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"eleven":[0.0,0.172,0.259,0.334,0.352,0.351,0.291,0.192,0.125,0.056,0.022,0.04,0.011,0.003,0.001,0.004,0.001,0.001,0.0,0.001,0.001,0.001,0.132,0.186,0.237,0.381,0.359,0.311,0.231,0.162,0.087,0.04,0.053,0.053,0.051,0.033,0.02,0.005,0.001,0.001,0.0,0.0,0.0,0.0,0.005,0.061,0.076,0.08,0.797,0.532,0.505,0.386,0.091,0.061,0.073,0.004,0.001,0.031,0.012,0.003,0.001,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.092,0.175,0.186,0.509,0.493,0.458,0.339,0.244,0.099,0.062,0.058,0.056,0.057,0.045,0.021,0.016,0.003,0.001,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.015,0.052,0.062,0.133,0.652,0.521,0.26,0.07,0.043,0.018,0.011,0.005,0.001,0.001,0.0,0.0,0.0,0.0,0.0,0.003,0.052,0.062,0.144,0.32,0.261,0.013,0.015,0.008,0.006,0.002,0.001,0.001,0.0,0.0,0.0,0.001,0.048,0.056,0.091,0.546,0.441,0.416,0.347,0.26,0.075,0.074,0.052,0.037,0.037,0.03,0.019,0.012,0.003,0.0,0.0,0.0,0.0,0.0,0.0,0.001,0.111,0.198,0.228,0.243,0.497,0.423,0.217,0.072,0.028,0.009,0.004,0.002,0.001,0.0,0.0,0.0,0.0,0.0,0.0,0.001,0.169,0.299,0.508,0.761,0.593,0.2,0.061,0.019,0.009,0.003,0.002,0.001,0.0,0.0,0.0,0.0,0.001,0.182,0.376,0.604,0.738,0.641,0.363,0.305,0.121,0.105,0.04,0.001,0.024,0.017,0.016,0.002,0.001,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.29,0.361,0.075,0.014,0.006,0.002,0.046,0.434,0.468,0.346,0.063,0.061,0.057,0.063,0.039,0.237,0.295,0.424,0.41,0.317,0.29,0.233,0.314,0.348,0.074]}};
+const TOOL = {
+  eleven: { name: 'ElevenLabs v3', c: '--t-eleven' }, humain: { name: 'HUMAIN Voice', c: '--t-humain' },
+  'humain-v': { name: 'HUMAIN بالتشكيل', c: '--t-humain' }, 'humain-b': { name: 'HUMAIN بلا تشكيل', c: '--t-humain' },
+  silma: { name: 'SILMA v1', c: '--t-silma' },
+  'habibi-b': { name: 'Habibi بلا تشكيل', c: '--t-habibi' }, 'habibi-v': { name: 'Habibi بالتشكيل', c: '--t-habibi' },
+};
+const ORDER = ['eleven', 'humain', 'humain-v', 'humain-b', 'silma', 'habibi-b', 'habibi-v'];
+const KIND = {
+  matar: ['word', 'كلمة'], milh: ['word', 'كلمة'], muhammad: ['word', 'شدة'], miftah: ['word', 'كلمة'],
+  urid: ['hard', 'همزة في أول الكلمة'], amjad: ['hard', 'همزة ومد'], da3: ['hard', 'الضاد'],
+  mim: ['sound', 'اسم حرف · في HUMAIN مع مَـ وبْ'], ma: ['sound', 'صوت مفرد'], b: ['sound', 'صوت مفرد'],
+  mahmud: ['sound', 'مقطعان منفصلان'], sentence: ['sentence', 'جملة'],
+};
+
+// Tool panels with a donut each: six texts whisper knows well.
+const TOOLS = [
+  { key: 'eleven', name: 'ElevenLabs v3', where: 'سحابي · مدفوع', verdict: 'الأدق في المشكول', vc: '--good',
+    score: { good: ['مطر', 'ملح', 'محمد', 'مفتاح', 'الجملة'], mid: ['أمجاد ← «امجد»'], bad: [] },
+    yes: 'كلمات وأصوات مفردة مشكولة، ومئات النصوص في طلب واحد', no: 'التشغيل على جهازك' },
+  { key: 'humain', name: 'HUMAIN Voice', where: 'سحابي · سعودي', verdict: 'قوي في الكلام العادي', vc: '--mid',
+    score: { good: ['مطر', 'ملح', 'مفتاح', 'الجملة'], mid: ['أمجاد ← «أمجات»'], bad: ['محمد ← «دام حمدكتور»'] },
+    yes: 'جمل التعليمات، المحتوى الحواري، اللهجة السعودية', no: 'المقاطع والأصوات المفردة، والتقطيع الآلي' },
+  { key: 'silma', name: 'SILMA v1', where: 'مفتوح · على الماك', verdict: 'للمسودات', vc: '--bad',
+    score: null, note: 'جُرّب على نصوص أخرى',
+    yes: 'مسودات سريعة ونماذج أولية بلا إنترنت', no: 'الأصوات المفردة والمحتوى التعليمي' },
+  { key: 'habibi', name: 'Habibi', where: 'مفتوح · على الماك', verdict: 'للتجارب', vc: '--bad',
+    score: { good: ['مطر', 'ملح', 'محمد', 'مفتاح', 'الجملة'], mid: [], bad: ['أمجاد ← «mjad»'] }, sub: 'بلا تشكيل · وبالتشكيل 0 من 6',
+    yes: 'جمل غير مشكولة، لهجات، تجارب', no: 'أي نص مشكول' },
+];
+const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const tip = document.getElementById('tip');
+function showTip(target, text) {
+  tip.textContent = text; tip.hidden = false;
+  const r = target.getBoundingClientRect();
+  tip.style.left = Math.min(innerWidth - tip.offsetWidth - 8, Math.max(8, r.left + r.width / 2 - tip.offsetWidth / 2)) + 'px';
+  tip.style.top = Math.max(8, r.top - tip.offsetHeight - 8) + 'px';
+}
+const hideTip = () => { tip.hidden = true; };
+const SVG = 'http://www.w3.org/2000/svg';
+function donut(score, label) {
+  const svg = document.createElementNS(SVG, 'svg'); svg.setAttribute('viewBox', '0 0 84 84'); svg.classList.add('donut');
+  const r = 34, C = 2 * Math.PI * r, gap = 3;
+  const parts = score ? [['good', score.good], ['mid', score.mid], ['bad', score.bad]].filter((p) => p[1].length) : [['none', [1, 1, 1, 1, 1, 1]]];
+  let off = 0;
+  for (const [state, list] of parts) {
+    const len = (list.length / 6) * C;
+    const c = document.createElementNS(SVG, 'circle');
+    c.setAttribute('cx', 42); c.setAttribute('cy', 42); c.setAttribute('r', r); c.setAttribute('fill', 'none');
+    c.setAttribute('stroke', `var(--${state})`); c.setAttribute('stroke-width', 9);
+    c.setAttribute('stroke-dasharray', `${Math.max(1, len - (parts.length > 1 ? gap : 0))} ${C}`);
+    c.setAttribute('stroke-dashoffset', -off); c.setAttribute('transform', 'rotate(-90 42 42)');
+    if (score) {
+      const t = `${{ good: 'صحيح', mid: 'قريب', bad: 'خطأ' }[state]}: ${list.length} من 6 — ${list.join('، ')}`;
+      c.setAttribute('tabindex', '0'); c.setAttribute('aria-label', `${label}، ${t}`); c.style.cursor = 'default';
+      c.addEventListener('pointerenter', () => showTip(c, t)); c.addEventListener('focus', () => showTip(c, t));
+      c.addEventListener('pointerleave', hideTip); c.addEventListener('blur', hideTip);
+    }
+    svg.append(c); off += len;
+  }
+  const tx = document.createElementNS(SVG, 'text'); tx.setAttribute('x', 42); tx.setAttribute('y', 48);
+  tx.setAttribute('text-anchor', 'middle'); tx.setAttribute('font-size', score ? 17 : 13);
+  tx.textContent = score ? `${score.good.length}/6` : '—';
+  svg.append(tx);
+  return svg;
+}
+const toolsEl = document.getElementById('tools');
+for (const t of TOOLS) {
+  const p = document.createElement('article'); p.className = 'panel span-3 tool-panel'; p.style.setProperty('--tc', `var(--t-${t.key})`);
+  const top = document.createElement('div'); top.className = 'tool-top';
+  top.append(donut(t.score, t.name));
+  const names = document.createElement('div'); names.className = 'names';
+  names.innerHTML = `<span class="tool-name"></span><span class="tool-where"></span>`;
+  names.children[0].textContent = t.name; names.children[1].textContent = t.sub || t.note || t.where;
+  top.append(names);
+  const v = document.createElement('span'); v.className = 'verdict'; v.style.setProperty('--vc', `var(${t.vc})`); v.textContent = t.verdict;
+  const dl = document.createElement('dl'); dl.className = 'fitlist'; dl.style.margin = 0;
+  for (const [k, val] of [['يناسب', t.yes], ['لا يناسب', t.no]]) {
+    const d = document.createElement('div'); const dt = document.createElement('dt'); dt.textContent = k;
+    const dd = document.createElement('dd'); dd.textContent = val; d.append(dt, dd); dl.append(d);
+  }
+  const m = document.createElement('div'); m.className = 'meta-line'; m.textContent = t.where;
+  p.append(top, v, dl, m); toolsEl.append(p);
+}
+
+// Waveforms.
+function drawWave(id, peaks, token) {
+  const c = document.getElementById(id); if (!c || !peaks) return;
+  const dpr = devicePixelRatio || 1, w = c.clientWidth, h = c.clientHeight;
+  c.width = w * dpr; c.height = h * dpr;
+  const g = c.getContext('2d'); g.scale(dpr, dpr); g.clearRect(0, 0, w, h); g.fillStyle = css(token);
+  const max = Math.max(...peaks, 0.01), step = w / peaks.length, bw = Math.max(1, step - 1.2);
+  peaks.forEach((p, i) => { const bh = Math.max(1, (p / max) * (h - 12)); g.fillRect(i * step, (h - bh) / 2, bw, bh); });
+}
+const drawWaves = () => { if (DATA) { drawWave('wave-eleven', DATA.wave.eleven, '--t-eleven'); drawWave('wave-humain', DATA.wave.humain, '--t-humain'); } };
+drawWaves(); addEventListener('resize', drawWaves);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawWaves);
+
+// Listening board.
+const PLAY = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13 2v12L3 8z"/></svg>';
+const STOP = '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="3" width="10" height="10" rx="1"/></svg>';
+const audio = new Audio(); let current = null;
+function stop() { if (current) { current.setAttribute('aria-pressed', 'false'); current.innerHTML = PLAY; current = null; } audio.pause(); }
+audio.addEventListener('ended', stop);
+const board = document.getElementById('board');
+for (const item of (DATA ? DATA.items : [])) {
+  const [group, kind] = KIND[item.key] || ['word', ''];
+  const card = document.createElement('div'); card.className = 'word'; card.dataset.g = group;
+  const head = document.createElement('div'); head.className = 'word-head';
+  const w = document.createElement('span'); w.className = 'w'; w.textContent = item.text;
+  const k = document.createElement('span'); k.className = 'k'; k.textContent = kind;
+  head.append(w, k);
+  const clips = document.createElement('div'); clips.className = 'clips';
+  for (const tool of ORDER) {
+    const clip = item.clips[tool]; if (!clip) continue;
+    const row = document.createElement('div'); row.className = 'clip'; row.style.setProperty('--tc', `var(${TOOL[tool].c})`);
+    const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'play'; btn.innerHTML = PLAY;
+    btn.setAttribute('aria-pressed', 'false'); btn.setAttribute('aria-label', `شغّل ${item.text} بـ ${TOOL[tool].name}`);
+    btn.addEventListener('click', () => {
+      const same = current === btn; stop(); if (same) return;
+      audio.src = clip.src; audio.play().catch(stop);
+      current = btn; btn.setAttribute('aria-pressed', 'true'); btn.innerHTML = STOP;
+    });
+    const t = document.createElement('span'); t.className = 't'; t.textContent = TOOL[tool].name;
+    const h = document.createElement('span'); h.className = 'h';
+    h.append('سمع whisper: '); const b = document.createElement('b'); b.textContent = clip.heard || '—'; h.append(b);
+    row.append(btn, t, h); clips.append(row);
+  }
+  card.append(head, clips); board.append(card);
+}
+document.querySelectorAll('.filters button').forEach((btn) => btn.addEventListener('click', () => {
+  document.querySelectorAll('.filters button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+  const f = btn.dataset.f;
+  board.querySelectorAll('.word').forEach((c) => { c.hidden = f !== 'all' && c.dataset.g !== f; });
+}));
+</script>
+</body>
+</html>
